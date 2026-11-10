@@ -1,0 +1,53 @@
+
+name: Generar APK Pool Laser Pro
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - principal
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Preparar Android
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar SDK
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Extraer proyecto
+        run: unzip -q PoolLaserPro_MobileBuild.zip -d proyecto
+
+      - name: Ajustar Kotlin
+        run: sed -i 's/2.0.21/1.9.25/g' proyecto/build.gradle.kts
+
+      - name: Compilar APK
+        run: gradle --no-daemon -p proyecto assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: PoolLaserPro
+          path: proyecto/app/build/outputs/apk/debug/app-debug.apk
