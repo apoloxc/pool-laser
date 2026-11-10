@@ -42,6 +42,7 @@ jobs:
 
       - name: Ajustar Kotlin
         run: sed -i 's/2.0.21/1.9.25/g' proyecto/build.gradle.kts
+          sed -i 's/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g' proyecto/app/build.gradle.kts
 
       - name: Compilar APK
         run: gradle --no-daemon -p proyecto assembleDebug
